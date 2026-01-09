@@ -1,0 +1,199 @@
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+*.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Data files (large dataset)
+data/*.csv
+data/*.zip
+data/*.json
+data/*.parquet
+!data/.gitkeep
+
+# Model files (can be large)
+results/models/**/*.h5
+results/models/**/*.keras
+results/models/**/*.pb
+results/models/**/*.pt
+results/models/**/*.pth
+results/models/**/*.ckpt
+results/models/**/*.pkl
+!results/models/.gitkeep
+!results/models/best_nn_models/.gitkeep
+!results/models/baseline_models/.gitkeep
+
+# Generated figures (can regenerate)
+results/figures/**/*.png
+results/figures/**/*.jpg
+results/figures/**/*.pdf
+results/figures/**/*.svg
+!results/figures/.gitkeep
+!results/figures/nn_architectures/.gitkeep
+!results/figures/learning_curves/.gitkeep
+!results/figures/ablation_studies/.gitkeep
+
+# Temporary result files
+results/tables/*.csv
+!results/tables/.gitkeep
+
+# Keep experiment logs (track experiments in git)
+# results/experiment_logs/*.csv are tracked
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Logs
+*.log
+logs/
+*.out
+
+# Distribution / packaging
+.dist/
+dist/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# TensorFlow / Keras
+*.h5
+checkpoint
+*.ckpt
+*.ckpt.data-*
+*.ckpt.index
+*.ckpt.meta
+saved_model/
+tensorboard_logs/
+tf_logs/
+
+# Pickle files (except scaler)
+*.pkl
+!results/fitted_scaler.pkl
+
+# Compressed files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Misc
+.cache/
+*.bak
+*.orig
