@@ -1,141 +1,203 @@
-# Neural Network Architectures for Credit Card Fraud Detection
+# Dual-Dataset Neural Network Study for Credit Card Fraud Detection
 
-A deep exploration of how **neural network design choices** (depth, width, regularization strategies, and class-imbalance handling) affect fraud detection performance on highly imbalanced tabular data.
+A rigorous investigation of how **neural network architectural and regularization decisions** generalize across fraud detection data regimes by conducting controlled experiments on a synthetic dataset and validating performance on a real-world, PCA-transformed dataset.
 
 ## 🎯 Project Goal
 
-**Explore how neural network design choices affect fraud detection performance under extreme class imbalance.** This project systematically compares MLP architectures and training strategies to optimize neural networks for real-world fraud detection deployment.
+**Demonstrate that neural network design principles discovered in controlled settings transfer to production-grade fraud detection scenarios.** This dual-dataset approach ensures findings are robust and generalizable rather than artifacts of a single dataset's peculiarities.
 
-## 🔬 Core Research Questions
+## 🔬 Core Research Question
 
-- **How does neural network depth vs width affect fraud detection capability?**
-- **Which regularization strategies best prevent overfitting in fraud detection NNs?**
-- **How should neural networks handle extreme class imbalance (99.2% vs 0.8%)?**
-- **What architectural choices optimize the precision-recall trade-off for neural networks?**
+**Do neural network architectural choices (depth vs width, regularization strategies, threshold optimization) generalize across fraud detection data regimes?**
 
-## 📊 Dataset & Challenge
+### Secondary Questions
+- Which architectural configurations remain stable across synthetic and real-world data?
+- How do regularization strategies (dropout, L2, batch normalization) adapt to different imbalance ratios?
+- What design principles transfer beyond simplified benchmarks to production scenarios?
+- When do baseline models (Random Forest, Logistic Regression) dominate, and why?
 
-- **Source:** [Credit Card Fraud Dataset](https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud)
-- **Challenge:** Severe class imbalance typical in fraud detection (fraud transactions <1%)
-- **Features:** 8 tabular features suitable for MLP architecture exploration
-  - `distance_from_home`
-  - `distance_from_last_transaction`
-  - `ratio_to_median_purchase_price`
-  - `repeat_retailer`
-  - `used_chip`
-  - `used_pin_number`
-  - `online_order`
-  - `fraud` (target variable)
+## 📊 Dual-Dataset Approach
 
-## 🧪 Neural Network Experiments
+### Dataset 1: card_transdata.csv (Synthetic - Exploration Phase)
+- **Source:** [Kaggle - Credit Card Fraud Dataset](https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud)
+- **Size:** ~1,000,000 transactions
+- **Features:** 7 interpretable features (distances, ratios, binary indicators)
+- **Fraud Rate:** ~0.8% (moderate imbalance, 1:124 ratio)
+- **Role:** Controlled environment for architecture exploration and ablation studies
+- **Expected Baseline:** Random Forest likely achieves PR-AUC ≈ 1.0 (near-perfect)
+- **Value:** Clean experiments without confounding factors
 
-1. **Architecture Search:** Systematic depth vs width comparison
-2. **Regularization Study:** Dropout, L2, BatchNorm effectiveness
-3. **Class Imbalance:** NN-specific strategies (class weights, focal loss)
-4. **Ablation Analysis:** Component contribution to NN performance
-5. **Threshold Optimization:** Production deployment considerations
+### Dataset 2: creditcard.csv (Real-World - Validation Phase)
+- **Source:** [Kaggle - ULB Credit Card Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+- **Size:** ~284,000 transactions
+- **Features:** 30 PCA-transformed components + Time + Amount
+- **Fraud Rate:** ~0.17% (extreme imbalance, 1:577 ratio)
+- **Role:** Production-grade validation benchmark
+- **Expected Baseline:** Competitive but challenging
+- **Value:** Authoritative test of generalization
+
+## 🧪 Experimental Design
+
+### Phase 1: Architecture Exploration (card_transdata.csv)
+1. **8 Architecture Comparison:** Shallow ([32]), Medium ([128,64,32]), Deep ([512,256,128,64,32,16]), Wide ([512])
+2. **Ablation Study:** Isolate effects of dropout, L2, batch normalization
+3. **Selection:** Best architecture by validation PR-AUC → transfer to Phase 2
+
+### Phase 2: Regularization Optimization (creditcard.csv)
+1. **Apply Best Architecture:** Use structure from Phase 1, train from scratch
+2. **Regularization Grid:** Dropout [0.2-0.4], L2 [0.001-0.01], BatchNorm
+3. **Threshold Optimization:** Tune on validation set for precision/recall balance
+4. **ONE-TIME Test Evaluation:** Final held-out performance (no iteration)
+
+### Phase 3: Cross-Dataset Analysis
+1. Compare NN behavior across datasets (overfitting, stability)
+2. Identify transferable design principles
+3. Synthesize generalizable insights for fraud detection NNs
 
 ## 🛠️ Setup Environment
 
 ### Prerequisites
 - Python 3.9+
-- pip or conda package manager
+- TensorFlow 2.10+
+- scikit-learn, pandas, numpy, matplotlib, seaborn
 
 ### Installation
 
 ```bash
-# Clone or navigate to project directory
+# Navigate to project directory
 cd NNfinalProject
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Verify installation
+# Verify setup and create directory structure
 python config.py
 ```
 
-### GPU Support (Optional)
-For faster neural network training, install TensorFlow with GPU support:
-```bash
-pip install tensorflow-gpu>=2.10.0
-```
+### Data Acquisition
+Download both datasets and place in the `data/` directory:
+1. **card_transdata.csv:** [Kaggle Link](https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud)
+2. **creditcard.csv:** [Kaggle Link](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
 
-## 📓 How to Run (Neural Network Pipeline)
+## 📓 Notebook Execution Order
 
-Execute notebooks in the following order:
+### Phase 1: Architecture Exploration (Synthetic Dataset)
 
-### Phase 1: Data Understanding & Preparation
-1. **[01_data_analysis_and_nn_motivation.ipynb](notebooks/01_data_analysis_and_nn_motivation.ipynb)**
-   - Why neural networks suit this problem
-   - Data exploration and statistical analysis
-   - NN design motivation
+#### 1. [01_dual_dataset_overview.ipynb](notebooks/01_dual_dataset_overview.ipynb)
+**Purpose:** Comparative EDA and NN motivation  
+**Key Outputs:**
+- Class distribution comparison (0.8% vs 0.17% fraud)
+- Feature space analysis (interpretable vs PCA)
+- Dataset difficulty quantification (Cohen's d)
+- Cross-dataset comparison table
 
-2. **[02_preprocessing_and_baseline_comparison.ipynb](notebooks/02_preprocessing_and_baseline_comparison.ipynb)**
-   - Data preprocessing and split creation
-   - Baseline models (targets for NNs to beat)
+#### 2. [02_card_transdata_preprocessing_and_baselines.ipynb](notebooks/02_card_transdata_preprocessing_and_baselines.ipynb)
+**Purpose:** Establish preprocessing pipeline and baseline performance  
+**Key Outputs:**
+- Train/val/test splits (70/15/15, stratified)
+- Fitted StandardScaler (training set only)
+- Logistic Regression baseline
+- Random Forest baseline (expected: PR-AUC ≈ 1.0)
 
-### Phase 2: Core Neural Network Experiments
-3. **[03_neural_network_architectures.ipynb](notebooks/03_neural_network_architectures.ipynb)** 🔥
-   - **Core NN architecture exploration**
-   - Shallow vs medium vs deep MLPs
-   - Width vs depth experiments
+#### 3. [03_card_transdata_nn_architecture_and_ablation.ipynb](notebooks/03_card_transdata_nn_architecture_and_ablation.ipynb) 🔥
+**Purpose:** Systematic architecture exploration + ablation study  
+**Key Outputs:**
+- 8 architecture comparison (ARCH-01 to ARCH-08)
+- Ablation study (dropout, L2, batch norm effects)
+- **Best architecture selection for Phase 2**
+- Architecture performance table
 
-4. **[04_regularization_experiments.ipynb](notebooks/04_regularization_experiments.ipynb)** 🔥
-   - **NN regularization strategies**
-   - Dropout, L2, BatchNorm experiments
-   - Overfitting prevention analysis
+### Phase 2: Production Validation (Real-World Dataset)
 
-5. **[05_class_imbalance_strategies_for_nns.ipynb](notebooks/05_class_imbalance_strategies_for_nns.ipynb)** 🔥
-   - **NN-specific imbalance handling**
-   - Class weights, focal loss
-   - Threshold optimization
+#### 4. [04_creditcard_preprocessing_and_baselines.ipynb](notebooks/04_creditcard_preprocessing_and_baselines.ipynb)
+**Purpose:** Independent preprocessing and baseline training  
+**Key Outputs:**
+- Separate train/val/test splits for creditcard.csv
+- Separate fitted StandardScaler
+- Baselines on extreme imbalance (~0.17% fraud)
 
-### Phase 3: Advanced Analysis & Evaluation
-6. **[06_neural_network_ablation_study.ipynb](notebooks/06_neural_network_ablation_study.ipynb)** 🔥
-   - **Controlled NN component analysis**
-   - Systematic ablation experiments
+#### 5. [05_creditcard_nn_training_and_regularization.ipynb](notebooks/05_creditcard_nn_training_and_regularization.ipynb) 🔥
+**Purpose:** Apply best architecture + regularization optimization  
+**Key Outputs:**
+- Best architecture from NB03 trained on real data
+- Regularization experiments (REG-01 to REG-08)
+- **Best model selection by validation PR-AUC**
+- Learning curves and overfitting analysis
 
-7. **[07_threshold_optimization_and_final_evaluation.ipynb](notebooks/07_threshold_optimization_and_final_evaluation.ipynb)** 🔥
-   - **Final NN evaluation on test set**
-   - Error analysis and business impact
+#### 6. [06_creditcard_threshold_optimization_and_test_evaluation.ipynb](notebooks/06_creditcard_threshold_optimization_and_test_evaluation.ipynb) ⚠️
+**Purpose:** Threshold tuning + ONE-TIME test evaluation  
+**Key Outputs:**
+- Threshold optimization on validation set
+- **Final test set evaluation (EXACTLY ONCE)**
+- Error analysis (FP/FN patterns)
+- Business cost simulation
 
-8. **[08_neural_network_performance_analysis.ipynb](notebooks/08_neural_network_performance_analysis.ipynb)** 🔥
-   - **NN performance synthesis**
-   - Final recommendations
+### Phase 3: Cross-Dataset Analysis
+
+#### 7. [07_cross_dataset_nn_insights_and_conclusions.ipynb](notebooks/07_cross_dataset_nn_insights_and_conclusions.ipynb) 📊
+**Purpose:** Synthesize findings across datasets  
+**Key Outputs:**
+- Generalization comparison
+- Transferable design principles
+- Overfitting analysis across data regimes
+- Final recommendations and limitations
 
 ## 📁 Project Structure
 
 ```
 NNfinalProject/
-├── data/                           # Dataset storage
-│   └── card_transdata.csv
-├── notebooks/                      # Jupyter notebooks (execute in order)
-│   ├── 01_data_analysis_and_nn_motivation.ipynb
-│   ├── 02_preprocessing_and_baseline_comparison.ipynb
-│   ├── 03_neural_network_architectures.ipynb
-│   ├── 04_regularization_experiments.ipynb
-│   ├── 05_class_imbalance_strategies_for_nns.ipynb
-│   ├── 06_neural_network_ablation_study.ipynb
-│   ├── 07_threshold_optimization_and_final_evaluation.ipynb
-│   └── 08_neural_network_performance_analysis.ipynb
-├── src/                            # Reusable Python modules
-│   ├── nn_architectures.py        # NN architecture definitions
-│   ├── nn_training_utils.py       # NN training utilities
-│   ├── evaluation_metrics.py      # Evaluation functions
-│   └── visualization_utils.py     # Plotting functions
-├── results/                        # Output storage
-│   ├── figures/                   # Plots and visualizations
-│   │   ├── nn_architectures/
-│   │   ├── learning_curves/
-│   │   └── ablation_studies/
-│   ├── models/                    # Saved models
-│   │   ├── best_nn_models/
-│   │   └── baseline_models/
-│   └── experiment_logs/           # CSV experiment logs
-│       ├── nn_experiments.csv
-│       └── baseline_experiments.csv
-├── reports/                        # Documentation
-│   └── neural_network_methodology.md
+├── data/                                    # Datasets
+│   ├── card_transdata.csv                   # Synthetic dataset (~1M rows)
+│   └── creditcard.csv                       # Real-world ULB dataset (~284K rows)
+│
+├── notebooks/                               # Jupyter notebooks (7 total)
+│   ├── 01_dual_dataset_overview.ipynb
+│   ├── 02_card_transdata_preprocessing_and_baselines.ipynb
+│   ├── 03_card_transdata_nn_architecture_and_ablation.ipynb
+│   ├── 04_creditcard_preprocessing_and_baselines.ipynb
+│   ├── 05_creditcard_nn_training_and_regularization.ipynb
+│   ├── 06_creditcard_threshold_optimization_and_test_evaluation.ipynb
+│   └── 07_cross_dataset_nn_insights_and_conclusions.ipynb
+│
+├── src/                                     # Reusable utility modules
+│   ├── nn_architectures.py                  # MLP builders (dataset-agnostic)
+│   ├── nn_training_utils.py                 # Training pipeline, logging
+│   ├── evaluation_metrics.py                # Fraud-specific metrics
+│   └── visualization_utils.py               # Plotting functions
+│
+├── results/                                 # All experimental outputs
+│   ├── card_transdata/                      # Synthetic dataset results
+│   │   ├── models/
+│   │   │   ├── baselines/                   # LR, RF baselines
+│   │   │   └── neural_networks/             # 8+ NN architectures
+│   │   ├── figures/                         # Visualizations
+│   │   ├── tables/                          # CSV summaries
+│   │   └── logs/                            # Experiment logs
+│   │
+│   ├── creditcard/                          # Real-world dataset results
+│   │   ├── models/
+│   │   │   ├── baselines/                   # LR, RF baselines
+│   │   │   └── neural_networks/             # Best NN + regularization variants
+│   │   ├── figures/                         # Visualizations
+│   │   ├── tables/                          # CSV summaries (incl. final test)
+│   │   └── logs/                            # Experiment logs
+│   │
+│   └── cross_dataset_analysis/              # Comparative analysis
+│       ├── figures/                         # Cross-dataset comparisons
+│       └── tables/                          # Summary tables
+│
+├── docs/                                    # Methodology documentation
+│   ├── data_leakage_prevention_checklist.md # 27 mandatory rules
+│   ├── neural_network_design_rationale.md   # Architecture justification
+│   └── dual_dataset_methodology.md          # Dual-dataset approach explained
+│
+├── reports/
+│   └── neural_network_methodology.md        # Comprehensive report
+│
+├── config.py                                # Global configuration
+├── requirements.txt                         # Python dependencies
+└── README.md                                # This file
+```
 ├── docs/                           # Additional documentation
 │   ├── data_leakage_prevention_checklist.md
 │   └── neural_network_design_rationale.md
@@ -145,71 +207,97 @@ NNfinalProject/
 
 ## 📈 Key Deliverables
 
-### 1. Neural Network Architecture Recommendations
-Based on systematic comparison of shallow, medium, and deep MLPs with varying widths.
+### 1. Architecture Generalization Analysis
+Systematic evidence showing which NN architectures transfer from synthetic to real-world fraud detection.
 
 ### 2. Regularization Strategy Guidelines
-Evidence-based recommendations for Dropout, L2, and BatchNorm in imbalanced classification.
+Dataset-specific regularization recommendations with empirical validation across imbalance ratios.
 
-### 3. Deployment-Ready Model
-Best neural network model with optimized decision threshold for production use.
+### 3. Cross-Dataset Performance Comparison
+Comprehensive analysis of NN behavior (overfitting, stability, generalization) across data regimes.
 
-### 4. Training Procedure Documentation
-Complete methodology for reproducible neural network training on imbalanced data.
+### 4. Production-Ready Model with Threshold Optimization
+Best NN model validated on real-world data with optimized decision threshold.
 
-## 🔄 Reproducibility
+### 5. Reproducible Experimental Methodology
+Complete dual-dataset pipeline for evaluating NN design principles in fraud detection.
+
+## 🔄 Reproducibility Guarantees
 
 This project ensures complete reproducibility through:
 
 - **Fixed Random Seed:** All experiments use `RANDOM_SEED = 42`
-- **Consistent Data Splits:** Train/val/test indices saved and reused
-- **Environment Specification:** `requirements.txt` for exact package versions
-- **Leakage Prevention:** StandardScaler fit only on training data
-- **Comprehensive Logging:** All experiments logged to CSV with hyperparameters
+- **Saved Data Splits:** Train/val/test indices stored as `.npy` files (never re-split)
+- **Fitted Scalers:** Preprocessing fitted once on training data, saved as `.pkl`
+- **Dataset Isolation:** Separate preprocessing pipelines for each dataset
+- **Experiment Logging:** Complete CSV logs with 25+ columns per experiment
+- **One-Time Test Evaluation:** Test set touched EXACTLY ONCE per dataset
+- **Version Control:** All hyperparameters documented in experiment logs
 
-See [docs/data_leakage_prevention_checklist.md](docs/data_leakage_prevention_checklist.md) for detailed guidelines.
+See [docs/data_leakage_prevention_checklist.md](docs/data_leakage_prevention_checklist.md) for 27 mandatory rules.
 
 ## 📊 Evaluation Metrics
 
-### Primary Metrics (Neural Network Focus)
-- **Precision (Fraud Class):** Minimize false positives
-- **Recall (Fraud Class):** Minimize false negatives
-- **F1-Score (Fraud Class):** Balance precision and recall
-- **PR-AUC:** Precision-Recall curve area (best for imbalanced data)
+### Primary Metrics
+- **PR-AUC:** Precision-Recall Area Under Curve (best for extreme imbalance)
+- **Recall (Fraud):** Proportion of actual fraud caught
+- **Precision (Fraud):** Proportion of fraud predictions that are correct
+- **F1-Score (Fraud):** Harmonic mean of precision and recall
 - **ROC-AUC:** Receiver Operating Characteristic curve area
 
 ### Secondary Metrics
-- Accuracy (reported but not primary due to class imbalance)
+- Accuracy (reported but not primary - can be misleading with imbalance)
 - Confusion Matrix Analysis
-- Training/Validation Loss Curves
+- Training-Validation Gap (overfitting measure)
 
-**Why not Accuracy?** With 99.2% legitimate transactions, a model predicting "all legitimate" achieves 99.2% accuracy while detecting zero fraud. Hence, fraud-class specific metrics are essential.
+**Why PR-AUC over Accuracy?** With 0.17%-0.8% fraud rates, a model predicting "all legitimate" achieves 99%+ accuracy while detecting zero fraud. PR-AUC correctly captures fraud detection performance.
 
-## 🧠 Neural Network Mastery
+## 🎓 Why This Project Matters
 
-This project demonstrates mastery of neural networks by:
+### Academic Contribution
+This dual-dataset approach addresses a critical gap in NN fraud detection research:
 
-1. **Systematic Architecture Exploration:** Depth vs width trade-offs with empirical evidence
-2. **Regularization Analysis:** Understanding when and why each regularization technique helps
-3. **Class Imbalance Handling:** NN-specific strategies beyond classical ML approaches
-4. **Controlled Ablation Studies:** Isolating individual component contributions
-5. **Training Dynamics:** Analyzing learning curves and convergence behavior
-6. **Production Considerations:** Threshold optimization and deployment readiness
+**Problem:** Most studies use single datasets, making it unclear if findings generalize or are dataset-specific artifacts.
 
-## 📚 References & Credits
+**Solution:** By separating controlled exploration (synthetic data) from production validation (real-world data), we demonstrate that NN design principles are **transferable** rather than coincidental.
 
-- **Dataset Source:** [Kaggle - Credit Card Fraud Dataset](https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud)
-- **License:** Please refer to the original dataset license on Kaggle
+### Key Insights Expected
+1. **Architecture Transfer:** Do layer configurations that work on clean data generalize to noisy data?
+2. **Regularization Adaptation:** How do dropout/L2/batch norm requirements change with extreme imbalance?
+3. **Baseline Dominance:** When and why do tree-based models dominate, and what does this reveal about data complexity?
+4. **Production Readiness:** What NN design choices lead to stable deployment-grade models?
+
+## 🧠 Neural Network Mastery Demonstration
+
+This project showcases deep NN expertise through:
+
+1. **Systematic Architecture Exploration:** 8 architectures compared with principled layer design
+2. **Controlled Ablation Studies:** Isolating dropout, L2, and batch normalization effects independently
+3. **Regularization Optimization:** Evidence-based selection across different imbalance ratios
+4. **Cross-Dataset Validation:** Demonstrating generalization beyond single-dataset optimization
+5. **Training Dynamics Analysis:** Learning curves, convergence monitoring, early stopping
+6. **Threshold Optimization:** Production-grade precision/recall tradeoff tuning
+7. **Data Leakage Prevention:** Rigorous experimental methodology with 27 mandatory checks
+
+## 📚 References & Documentation
+
+- **card_transdata.csv:** [Kaggle - Credit Card Fraud Dataset](https://www.kaggle.com/datasets/dhanushnarayananr/credit-card-fraud)
+- **creditcard.csv:** [Kaggle - ULB Credit Card Dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
+- **Methodology:** See [docs/dual_dataset_methodology.md](docs/dual_dataset_methodology.md)
+- **Design Rationale:** See [docs/neural_network_design_rationale.md](docs/neural_network_design_rationale.md)
 - **Academic Context:** Neural Networks & Deep Learning Final Project
 
-## 👤 Author
+## 🚨 Important Notes
 
-Created as part of Neural Networks & Deep Learning coursework.
+### Baseline Performance Expectations
+- **On card_transdata.csv:** Random Forest may achieve PR-AUC ≈ 1.0 (near-perfect). This is **expected and acceptable** - the synthetic dataset's role is enabling clean architecture studies, not challenging baselines.
+- **On creditcard.csv:** Baselines provide realistic reference points. NN value lies in transferable design principles and controlled generalization.
 
-## 📝 License
-
-This project is for educational purposes. Dataset license applies as per original source.
+### Test Set Usage
+- Test sets are evaluated **EXACTLY ONCE** per dataset
+- No model iteration after seeing test results
+- Results reported as-is with honest limitations discussed
 
 ---
 
-**Note:** This is a neural networks research project. Classical ML baselines (Logistic Regression, Random Forest) are included only for comparison purposes to demonstrate the advantages of neural network approaches for this problem.
+**Project Focus:** Demonstrating that neural network design principles generalize across fraud detection data regimes, NOT claiming NNs always beat Random Forest.
