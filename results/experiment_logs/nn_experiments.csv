@@ -1,0 +1,1 @@
+experiment_id,date_created,notebook,model_name,architecture,layers,random_seed,dropout_rate,l2_reg,batch_norm,class_weight_strategy,learning_rate,batch_size,optimizer,precision_fraud,recall_fraud,f1_fraud,pr_auc,roc_auc,accuracy,confusion_matrix,epochs_trained,training_time_seconds,inference_time_seconds,val_loss,train_loss,notes
