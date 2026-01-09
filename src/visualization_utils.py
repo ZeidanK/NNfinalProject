@@ -73,6 +73,35 @@ def plot_learning_curves(
     plt.show()
 
 
+def plot_training_history(
+    history,
+    metrics: List[str] = ['loss', 'pr_auc'],
+    save_path: Optional[str] = None,
+    title: str = "Training History"
+):
+    """
+    Plot training history (alias for plot_learning_curves).
+    
+    Parameters:
+    -----------
+    history : keras.callbacks.History or dict
+        Training history from model.fit() or dictionary
+    metrics : List[str]
+        Metrics to plot
+    save_path : str, optional
+        Path to save figure
+    title : str
+        Plot title
+    """
+    # Convert History object to dict if needed
+    if hasattr(history, 'history'):
+        history_dict = history.history
+    else:
+        history_dict = history
+    
+    plot_learning_curves(history_dict, metrics=metrics, save_path=save_path, title=title)
+
+
 def plot_confusion_matrix(
     y_true: np.ndarray,
     y_pred: np.ndarray,

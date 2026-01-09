@@ -284,6 +284,92 @@ def compile_model(
     return model
 
 
+def train_nn_with_early_stopping(
+    model: keras.Model,
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    X_val: np.ndarray,
+    y_val: np.ndarray,
+    epochs: int = 100,
+    batch_size: int = 64,
+    patience: int = 15,
+    class_weight: str = 'balanced',
+    learning_rate: float = 0.001,
+    verbose: int = 1
+) -> keras.callbacks.History:
+    """
+    Train neural network with early stopping and standard configuration.
+    
+    Parameters:
+    -----------
+    model : keras.Model
+        Uncompiled or compiled Keras model
+    X_train : np.ndarray
+        Training features
+    y_train : np.ndarray
+        Training labels
+    X_val : np.ndarray
+        Validation features
+    y_val : np.ndarray
+        Validation labels
+    epochs : int
+        Maximum number of epochs
+    batch_size : int
+        Batch size for training
+    patience : int
+        Early stopping patience
+    class_weight : str
+        'balanced', 'custom', or None
+    learning_rate : float
+        Learning rate for optimizer
+    verbose : int
+        Verbosity level
+        
+    Returns:
+    --------
+    keras.callbacks.History
+        Training history object
+    """
+    # Compile model if not already compiled
+    # Check if model has an optimizer (indicates it's compiled)
+    if not hasattr(model, 'optimizer') or model.optimizer is None:
+        model = compile_model(model, learning_rate=learning_rate)
+    
+    # Get class weights
+    class_weights = get_class_weights(y_train, class_weight)
+    
+    # Setup callbacks
+    callbacks = [
+        EarlyStopping(
+            monitor='val_loss',
+            patience=patience,
+            min_delta=0.0001,
+            restore_best_weights=True,
+            verbose=1 if verbose > 0 else 0
+        ),
+        ReduceLROnPlateau(
+            monitor='val_loss',
+            factor=0.5,
+            patience=max(5, patience // 3),
+            min_lr=1e-6,
+            verbose=1 if verbose > 0 else 0
+        )
+    ]
+    
+    # Train model
+    history = model.fit(
+        X_train, y_train,
+        validation_data=(X_val, y_val),
+        class_weight=class_weights,
+        batch_size=batch_size,
+        epochs=epochs,
+        callbacks=callbacks,
+        verbose=verbose
+    )
+    
+    return history
+
+
 def log_experiment(
     experiment_data: Dict,
     log_file: str = None

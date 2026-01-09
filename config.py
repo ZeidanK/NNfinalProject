@@ -81,6 +81,7 @@ STRATIFY = True  # Always stratify for imbalanced data
 DEFAULT_OPTIMIZER = "adam"
 DEFAULT_LEARNING_RATE = 0.001
 DEFAULT_BATCH_SIZE = 64
+BATCH_SIZE = 64  # Alias for DEFAULT_BATCH_SIZE
 
 # Dataset-specific training configs
 CARD_TRANSDATA_EPOCHS = 100
@@ -88,6 +89,10 @@ CARD_TRANSDATA_EARLY_STOP_PATIENCE = 15
 
 CREDITCARD_EPOCHS = 150  # Longer for harder dataset
 CREDITCARD_EARLY_STOP_PATIENCE = 20
+
+# Global defaults (for backward compatibility)
+MAX_EPOCHS = CARD_TRANSDATA_EPOCHS
+EARLY_STOPPING_PATIENCE = CARD_TRANSDATA_EARLY_STOP_PATIENCE
 
 EARLY_STOPPING_MIN_DELTA = 0.0001
 
@@ -111,25 +116,25 @@ ARCHITECTURES_TO_TEST = {
 # ============================
 # Use medium_base [128, 64, 32] as reference
 ABLATION_EXPERIMENTS = {
-    "ABL-01": {"dropout": 0.0, "l2": 0.0, "batch_norm": False, "desc": "Baseline"},
-    "ABL-02": {"dropout": 0.3, "l2": 0.0, "batch_norm": False, "desc": "+Dropout"},
-    "ABL-03": {"dropout": 0.0, "l2": 0.01, "batch_norm": False, "desc": "+L2"},
-    "ABL-04": {"dropout": 0.0, "l2": 0.0, "batch_norm": True, "desc": "+BatchNorm"},
-    "ABL-05": {"dropout": 0.3, "l2": 0.01, "batch_norm": True, "desc": "Combined"},
+    "ABL-01": {"dropout": 0.0, "l2": 0.0, "batch_norm": False, "description": "Baseline"},
+    "ABL-02": {"dropout": 0.3, "l2": 0.0, "batch_norm": False, "description": "+Dropout"},
+    "ABL-03": {"dropout": 0.0, "l2": 0.01, "batch_norm": False, "description": "+L2"},
+    "ABL-04": {"dropout": 0.0, "l2": 0.0, "batch_norm": True, "description": "+BatchNorm"},
+    "ABL-05": {"dropout": 0.3, "l2": 0.01, "batch_norm": True, "description": "Combined"},
 }
 
 # ============================
 # REGULARIZATION OPTIMIZATION (creditcard.csv)
 # ============================
 REGULARIZATION_EXPERIMENTS = {
-    "REG-01": {"dropout": 0.0, "l2": 0.0, "batch_norm": False, "desc": "Baseline"},
-    "REG-02": {"dropout": 0.2, "l2": 0.0, "batch_norm": False, "desc": "Light dropout"},
-    "REG-03": {"dropout": 0.3, "l2": 0.0, "batch_norm": False, "desc": "Medium dropout"},
-    "REG-04": {"dropout": 0.4, "l2": 0.0, "batch_norm": False, "desc": "Heavy dropout"},
-    "REG-05": {"dropout": 0.0, "l2": 0.001, "batch_norm": False, "desc": "Light L2"},
-    "REG-06": {"dropout": 0.0, "l2": 0.01, "batch_norm": False, "desc": "Medium L2"},
-    "REG-07": {"dropout": 0.0, "l2": 0.0, "batch_norm": True, "desc": "BatchNorm only"},
-    "REG-08": {"dropout": 0.3, "l2": 0.01, "batch_norm": True, "desc": "Combined optimal"},
+    "REG-01": {"dropout": 0.0, "l2": 0.0, "batch_norm": False, "description": "Baseline"},
+    "REG-02": {"dropout": 0.2, "l2": 0.0, "batch_norm": False, "description": "Light dropout"},
+    "REG-03": {"dropout": 0.3, "l2": 0.0, "batch_norm": False, "description": "Medium dropout"},
+    "REG-04": {"dropout": 0.4, "l2": 0.0, "batch_norm": False, "description": "Heavy dropout"},
+    "REG-05": {"dropout": 0.0, "l2": 0.001, "batch_norm": False, "description": "Light L2"},
+    "REG-06": {"dropout": 0.0, "l2": 0.01, "batch_norm": False, "description": "Medium L2"},
+    "REG-07": {"dropout": 0.0, "l2": 0.0, "batch_norm": True, "description": "BatchNorm only"},
+    "REG-08": {"dropout": 0.3, "l2": 0.01, "batch_norm": True, "description": "Combined optimal"},
 }
 
 # ============================
@@ -284,6 +289,7 @@ def get_dataset_config(dataset_name):
             "figures_dir": CARD_TRANSDATA_FIGURES,
             "tables_dir": CARD_TRANSDATA_TABLES,
             "logs_dir": CARD_TRANSDATA_LOGS,
+            "experiment_logs_dir": CARD_TRANSDATA_LOGS,  # Alias for logs_dir
             "train_idx": CARD_TRANSDATA_TRAIN_IDX,
             "val_idx": CARD_TRANSDATA_VAL_IDX,
             "test_idx": CARD_TRANSDATA_TEST_IDX,
@@ -302,6 +308,7 @@ def get_dataset_config(dataset_name):
             "figures_dir": CREDITCARD_FIGURES,
             "tables_dir": CREDITCARD_TABLES,
             "logs_dir": CREDITCARD_LOGS,
+            "experiment_logs_dir": CREDITCARD_LOGS,  # Alias for logs_dir
             "train_idx": CREDITCARD_TRAIN_IDX,
             "val_idx": CREDITCARD_VAL_IDX,
             "test_idx": CREDITCARD_TEST_IDX,

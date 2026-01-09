@@ -12,6 +12,55 @@ from typing import List, Optional
 import config
 
 
+def build_fraud_detection_nn(
+    input_dim: int,
+    hidden_layers: List[int],
+    dropout_rate: float = 0.0,
+    l2_reg: float = 0.0,
+    use_batch_norm: bool = False,
+    activation: str = 'relu',
+    output_activation: str = 'sigmoid',
+    name: str = 'FraudDetectionNN'
+) -> keras.Model:
+    """
+    Build a neural network for fraud detection (alias for create_mlp).
+    
+    Parameters:
+    -----------
+    input_dim : int
+        Number of input features
+    hidden_layers : List[int]
+        Number of units in each hidden layer, e.g., [128, 64, 32]
+    dropout_rate : float
+        Dropout rate (0.0 = no dropout)
+    l2_reg : float
+        L2 regularization strength (0.0 = no regularization)
+    use_batch_norm : bool
+        Whether to use Batch Normalization
+    activation : str
+        Activation function for hidden layers
+    output_activation : str
+        Activation function for output layer
+    name : str
+        Model name
+        
+    Returns:
+    --------
+    keras.Model
+        Compiled Keras model
+    """
+    return create_mlp(
+        input_dim=input_dim,
+        hidden_layers=hidden_layers,
+        dropout_rate=dropout_rate,
+        l2_reg=l2_reg,
+        use_batch_norm=use_batch_norm,
+        activation=activation,
+        output_activation=output_activation,
+        name=name
+    )
+
+
 def create_mlp(
     input_dim: int,
     hidden_layers: List[int],
