@@ -38,7 +38,9 @@
 ## Recent Fixes (Session)
 1. ✅ Fixed Notebook 01 - OSError: Added `os.makedirs('../results/tables', exist_ok=True)` before saving CSV
 2. ✅ Fixed Notebook 01 - NameError: Defined `imbalance_ratio` and `fraud_percentage` in final summary cell
-3. 🔄 Started Notebook 04 - Dropout experiments implemented
+3. ✅ Fixed Notebooks 02, 03, 04 - AttributeError: Changed `config.DATA_PATH` → `config.DATASET_PATH`
+4. ✅ Fixed Notebooks 02, 03, 04 - AttributeError: Changed `config.SCALER_PATH` → `config.FITTED_SCALER_PATH`
+5. 🔄 Started Notebook 04 - Dropout experiments implemented
 
 ## Next Actions
 1. Complete Notebook 04 (L2, BatchNorm, combined experiments + visualization)

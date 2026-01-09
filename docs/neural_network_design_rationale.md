@@ -1,28 +1,114 @@
-# Neural Network Design Rationale
+# Neural Network Design Rationale - Dual-Dataset Study
+
+## Executive Summary
+
+This document explains the reasoning behind neural network architecture choices for credit card fraud detection across **two datasets** with distinct characteristics:
+
+1. **card_transdata.csv** (Synthetic): Controlled environment for systematic architecture exploration
+2. **creditcard.csv** (Real-world): Production-grade validation benchmark
+
+The dual-dataset approach ensures that design principles discovered in clean experimental conditions generalize to real-world fraud detection scenarios.
+
+---
 
 ## Why Neural Networks for Credit Card Fraud Detection?
 
-This document explains the reasoning behind neural network architecture choices for tabular fraud detection data and justifies key design decisions.
+### Beyond Beating Baselines
+
+**Critical Clarification:** This project does NOT aim to prove neural networks always beat Random Forest or Logistic Regression. Instead, we demonstrate:
+
+1. **Transferable Design Principles**: Architectural choices (depth vs width, regularization) that work across data regimes
+2. **Controlled Overfitting**: NNs can be regularized to generalize despite high capacity
+3. **Interpretable Architecture**: Principled design process vs black-box hyperparameter search
+4. **Production Readiness**: Stable training dynamics and threshold optimization
+
+### When NNs Provide Value
+
+Neural networks excel when:
+- Non-linear feature interactions are critical
+- Continuous probability outputs needed (threshold tuning)
+- Representation learning beneficial (intermediate abstractions)
+- Scalability to large datasets required
+- Transfer learning from related tasks possible
+
+**Expected Outcome on Synthetic Data**: Random Forest may achieve near-perfect performance (PR-AUC → 1.0) due to high feature separability. This is **acceptable** - the synthetic dataset's role is enabling clean ablation studies, not challenging baselines.
+
+**Expected Outcome on Real-World Data**: Neural networks demonstrate competitive performance with controlled overfitting, validating design principles from synthetic experiments.
 
 ---
 
-## 1. Problem Characteristics
+## 1. Problem Characteristics (Dual-Dataset)
 
-### Dataset Properties
-- **Data Type:** Tabular (7 features + 1 target)
-- **Feature Types:** Mixed (continuous distances, binary flags)
-- **Sample Size:** Large (>50MB, thousands of transactions)
-- **Class Distribution:** Extremely imbalanced (~99.2% legitimate, ~0.8% fraud)
+### Dataset 1: card_transdata.csv (Synthetic)
+- **Data Type:** Tabular (7 interpretable features)
+- **Sample Size:** ~1,000,000 transactions
+- **Class Distribution:** ~0.8% fraud (moderate imbalance)
+- **Feature Types:** Continuous distances, binary indicators
+- **Difficulty:** High separability (near-perfect baseline performance expected)
+- **Role:** Architecture exploration, ablation studies
 
-### Challenge: Extreme Class Imbalance
-The most critical challenge is the severe class imbalance. Traditional accuracy-based metrics are meaningless when predicting "all legitimate" achieves 99%+ accuracy. Neural networks must be specifically designed to:
+### Dataset 2: creditcard.csv (Real-World)
+- **Data Type:** Tabular (30 PCA-transformed features)
+- **Sample Size:** ~284,000 transactions  
+- **Class Distribution:** ~0.17% fraud (extreme imbalance)
+- **Feature Types:** PCA components V1-V28, plus Time and Amount
+- **Difficulty:** Real-world noise, ambiguity, edge cases
+- **Role:** Production-grade validation, final evaluation
+
+### Challenge: Extreme Class Imbalance (Both Datasets)
+The most critical challenge is severe class imbalance. Neural networks must:
 - Focus on minority class (fraud) detection
 - Balance precision (minimize false alarms) with recall (catch actual fraud)
 - Learn from very few positive examples
+- Handle class weights effectively
 
 ---
 
-## 2. Why Neural Networks (vs Classical ML)?
+## 2. Dual-Dataset Experimental Design
+
+### Phase 1: Architecture Exploration (card_transdata.csv)
+
+**Objective**: Systematically compare 8 MLP architectures in controlled environment
+
+**Architectures to Test**:
+1. **ARCH-01**: [32] - Minimal capacity baseline
+2. **ARCH-02**: [64, 32] - Small network
+3. **ARCH-03**: [128, 64, 32] - Balanced (likely optimal)
+4. **ARCH-04**: [256, 128, 64, 32] - Moderate depth
+5. **ARCH-05**: [512, 256, 128, 64, 32, 16] - Maximum depth
+6. **ARCH-06**: [256] - Wide-shallow
+7. **ARCH-07**: [512] - Very wide-shallow
+8. **ARCH-08**: [256, 128, 64] - Depth-width balance
+
+**Selection Criterion**: Best validation PR-AUC → transfer to Phase 2
+
+**Why Synthetic Data for This Phase**:
+- Clean ablation studies without confounding factors
+- Fast experimentation (simpler feature space)
+- Isolate architectural effects from data complexity
+- **Baseline dominance expected and acceptable**
+
+### Phase 2: Regularization Optimization (creditcard.csv)
+
+**Objective**: Validate best architecture on real-world data with proper regularization
+
+**Regularization Strategies**:
+- Dropout: [0.2, 0.3, 0.4]
+- L2 regularization: [0.001, 0.01]
+- Batch Normalization: [True, False]
+- Combined strategies
+
+**Selection Criterion**: Best validation PR-AUC → use for test evaluation
+
+**Why Real-World Data for This Phase**:
+- Production-grade benchmark
+- Extreme imbalance challenges regularization
+- PCA features test generalization beyond interpretable features
+- **Authoritative final evaluation**
+
+---
+
+## 3. Why Neural Networks (vs Classical ML)?
 
 ### Advantages of Neural Networks for This Problem
 

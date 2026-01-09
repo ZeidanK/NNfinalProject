@@ -1,7 +1,20 @@
-# Data Leakage Prevention Checklist
+# Data Leakage Prevention Checklist - Dual-Dataset Study
 
 ## Overview
-Data leakage occurs when information from outside the training dataset is used to create the model, leading to overly optimistic performance estimates that don't generalize to real-world scenarios. This checklist ensures proper experimental methodology.
+Data leakage occurs when information from outside the training dataset is used to create the model, leading to overly optimistic performance estimates that don't generalize to real-world scenarios. This checklist ensures proper experimental methodology for the **dual-dataset study** with card_transdata.csv and creditcard.csv.
+
+---
+
+## ✅ Dataset Isolation (Critical for Dual-Dataset Studies)
+
+### Cross-Dataset Contamination Prevention
+- [ ] **Maintain separate directories** - Each dataset has its own results/ subdirectory
+- [ ] **Independent splits** - card_transdata and creditcard have separate train/val/test splits
+- [ ] **Separate scalers** - Each dataset has its own fitted StandardScaler
+- [ ] **No dataset merging** - Never combine or pool data from both datasets
+- [ ] **No cross-dataset evaluation** - Models trained on one dataset are never evaluated on the other
+- [ ] **Independent experiment logs** - Each dataset maintains its own experiment tracking
+- [ ] **Comparison happens post-hoc** - Aggregate results only in final analysis (Notebook 07)
 
 ---
 
@@ -11,29 +24,34 @@ Data leakage occurs when information from outside the training dataset is used t
 - [ ] **Understand the target distribution** - Check class balance before splitting
 - [ ] **Decide on split ratios** - 70/15/15 for train/val/test is used in this project
 - [ ] **Set random seed** - Use `RANDOM_SEED = 42` for reproducibility
+- [ ] **Verify dataset identity** - Confirm which dataset (card_transdata or creditcard) is being processed
 
 ### During Split Creation
 - [ ] **Stratified split** - Preserve class distribution across train/val/test sets
 - [ ] **Test set isolation** - Physically separate test set immediately after creation
-- [ ] **Save split indices** - Store train/val/test indices as `.npy` files for reuse
+- [ ] **Save split indices** - Store train/val/test indices as `.npy` files in dataset-specific directory
 - [ ] **Verify distributions** - Confirm class balance is preserved in all splits
 - [ ] **Document split sizes** - Record number of samples in each split
+- [ ] **Check index uniqueness** - Ensure no overlap between train/val/test indices
 
 ### After Split Creation
-- [ ] **Never modify splits** - Use the same indices across all experiments
-- [ ] **Test set quarantine** - Do not look at test set until final evaluation
+- [ ] **Never modify splits** - Use the same indices across all experiments for that dataset
+- [ ] **Test set quarantine** - Do not look at test set until final evaluation (ONE-TIME)
 - [ ] **Validation set purpose** - Use only for hyperparameter tuning and model selection
+- [ ] **Load indices from saved files** - Never re-split in subsequent notebooks
 
 ---
 
 ## ✅ Feature Preprocessing
 
 ### StandardScaler (Feature Normalization)
-- [ ] **Fit on training data only** - `scaler.fit(X_train)`
+- [ ] **Fit on training data only** - `scaler.fit(X_train)` for each dataset independently
 - [ ] **Transform all splits separately** - `scaler.transform(X_train/val/test)`
-- [ ] **Save fitted scaler** - Store scaler as `.pkl` file
-- [ ] **Reuse same scaler** - Apply same scaler to all experiments
+- [ ] **Save fitted scaler** - Store scaler as `.pkl` file in dataset-specific directory
+- [ ] **Reuse same scaler** - Apply same scaler to all experiments for that dataset
 - [ ] **Never fit on test data** - Test data must be "unseen" to preprocessing
+- [ ] **No scaler sharing** - card_transdata and creditcard use different fitted scalers
+- [ ] **Load scaler from saved file** - Never re-fit in subsequent notebooks
 
 ### Feature Engineering (if applicable)
 - [ ] **Calculate statistics on training only** - Mean, std, min, max from training set
@@ -142,59 +160,181 @@ Data leakage occurs when information from outside the training dataset is used t
 
 ---
 
-## 📋 Verification Protocol
+## 📋 Verification Protocol (Dual-Dataset)
 
-Before running final test evaluation, verify:
+Before running final test evaluation on either dataset, verify:
 
 ```python
-# Verification checklist code
+# Verification checklist code for dual-dataset study
 import numpy as np
+import os
 
-# 1. Verify split indices are saved and consistent
-assert np.load('results/train_indices.npy').shape[0] > 0
-assert np.load('results/val_indices.npy').shape[0] > 0
-assert np.load('results/test_indices.npy').shape[0] > 0
+def verify_dataset_isolation(dataset_name):
+    """Verify no leakage for a specific dataset"""
+    print(f"\n{'='*60}")
+    print(f"Verifying {dataset_name} dataset isolation...")
+    print(f"{'='*60}")
+    
+    base_path = f'results/{dataset_name}'
+    
+    # 1. Verify split indices are saved and consistent
+    train_idx = np.load(f'{base_path}/train_indices.npy')
+    val_idx = np.load(f'{base_path}/val_indices.npy')
+    test_idx = np.load(f'{base_path}/test_indices.npy')
+    
+    print(f"✓ Split sizes: {len(train_idx)} train / {len(val_idx)} val / {len(test_idx)} test")
+    
+    # 2. Verify no overlap between splits
+    train_set = set(train_idx)
+    val_set = set(val_idx)
+    test_set = set(test_idx)
+    
+    assert len(train_set.intersection(val_set)) == 0, "Train/val overlap!"
+    assert len(train_set.intersection(test_set)) == 0, "Train/test overlap!"
+    assert len(val_set.intersection(test_set)) == 0, "Val/test overlap!"
+    print(f"✓ No index overlap between splits")
+    
+    # 3. Verify scaler exists
+    assert os.path.exists(f'{base_path}/fitted_scaler.pkl'), "Scaler not saved!"
+    print(f"✓ Fitted scaler saved")
+    
+    # 4. Verify experiment logs exist
+    assert os.path.exists(f'{base_path}/logs/'), "Experiment logs directory missing!"
+    print(f"✓ Experiment logs directory exists")
+    
+    print(f"✅ All leakage prevention checks passed for {dataset_name}!")
 
-# 2. Verify no overlap between splits
-train_idx = set(np.load('results/train_indices.npy'))
-val_idx = set(np.load('results/val_indices.npy'))
-test_idx = set(np.load('results/test_indices.npy'))
+# Verify both datasets
+verify_dataset_isolation('card_transdata')
+verify_dataset_isolation('creditcard')
 
-assert len(train_idx.intersection(val_idx)) == 0, "Train/val overlap!"
-assert len(train_idx.intersection(test_idx)) == 0, "Train/test overlap!"
-assert len(val_idx.intersection(test_idx)) == 0, "Val/test overlap!"
+# 5. Verify no cross-dataset contamination
+print(f"\n{'='*60}")
+print("Verifying cross-dataset isolation...")
+print(f"{'='*60}")
 
-# 3. Verify scaler was fit on training data only
-# (Check scaler fitting code in notebook 02)
+# Ensure split indices are completely different (different source data)
+ct_train = set(np.load('results/card_transdata/train_indices.npy'))
+cc_train = set(np.load('results/creditcard/train_indices.npy'))
 
-# 4. Verify test set not used in experiments CSV
-import pandas as pd
-experiments = pd.read_csv('results/experiment_logs/nn_experiments.csv')
-# Should not see 'test' in dataset column until final evaluation
-
-print("✅ All leakage prevention checks passed!")
+# These should be different sizes (different datasets)
+assert len(ct_train) != len(cc_train), "Datasets appear to be same size (suspicious!)"
+print(f"✓ Datasets are independently split (different sizes)")
+print(f"✅ Cross-dataset isolation verified!")
 ```
 
 ---
 
-## 📚 References
+## 🔬 Dual-Dataset Specific Checklist
 
-- **Cross-Validation Best Practices:** Use stratified K-fold on training+validation only
-- **Temporal Data:** For time-series, ensure no future information leaks to past
-- **External Data:** If using external datasets, ensure they don't contain test info
-- **Production Deployment:** Same leakage prevention applies in production pipelines
+### Architecture Transfer (card_transdata → creditcard)
+- [ ] **Select architecture on card_transdata only** - Use validation PR-AUC
+- [ ] **Transfer architecture config (not weights)** - Apply layer structure, not trained parameters
+- [ ] **Train from scratch on creditcard** - No weight transfer or fine-tuning
+- [ ] **Independent regularization tuning** - Optimize regularization separately on creditcard
+- [ ] **Document transfer rationale** - Explain why selected architecture should generalize
+
+### Cross-Dataset Comparison Rules
+- [ ] **Post-hoc comparison only** - Aggregate results after all experiments complete
+- [ ] **Same metrics across datasets** - Use identical evaluation metrics for fair comparison
+- [ ] **Report both validation AND test** - Show validation-based decisions AND test outcomes
+- [ ] **Discuss generalization** - Analyze which insights transfer vs dataset-specific findings
+- [ ] **Acknowledge baseline differences** - Explain if Random Forest dominates one dataset but not the other
+
+### Experiment IDs and Logging
+- [ ] **Consistent experiment IDs** - Use same IDs for equivalent configs across datasets
+  - Example: ARCH-03 = [128, 64, 32] on BOTH card_transdata and creditcard
+- [ ] **Dataset column in logs** - Clearly mark which dataset each experiment used
+- [ ] **Separate log files** - Each dataset maintains its own nn_experiments.csv
+- [ ] **Cross-reference experiments** - Enable matching by experiment_id across datasets
 
 ---
 
-## 🎓 Learning Objectives
+## 📊 Reporting Standards for Dual-Dataset Study
 
-By following this checklist, you demonstrate:
+### Required Reporting Elements
 
-1. **Understanding of experimental methodology** - Proper scientific approach
-2. **Knowledge of model evaluation** - Valid performance estimation
-3. **Production ML awareness** - Real-world deployment considerations
-4. **Statistical rigor** - Avoiding biased performance estimates
-5. **Reproducibility standards** - Enabling others to verify results
+1. **Dataset Characteristics Table**
+   ```
+   | Dataset | Samples | Features | Fraud % | Feature Type |
+   |---------|---------|----------|---------|--------------|
+   | card_transdata | 1M | 7 | 0.8% | Interpretable |
+   | creditcard | 284K | 30 | 0.17% | PCA-transformed |
+   ```
+
+2. **Baseline Performance Table** (per dataset)
+   ```
+   | Dataset | Model | PR-AUC | Recall | F1 |
+   |---------|-------|--------|--------|-----|
+   | card_transdata | LR | X.XX | X.XX | X.XX |
+   | card_transdata | RF | X.XX | X.XX | X.XX |
+   | creditcard | LR | X.XX | X.XX | X.XX |
+   | creditcard | RF | X.XX | X.XX | X.XX |
+   ```
+
+3. **Architecture Comparison Table** (validation performance)
+   ```
+   | Experiment ID | Architecture | card_transdata PR-AUC | creditcard PR-AUC |
+   |---------------|--------------|----------------------|-------------------|
+   | ARCH-01 | [32] | X.XX | X.XX |
+   | ARCH-03 | [128, 64, 32] | X.XX | X.XX |
+   | ...
+   ```
+
+4. **Test Set Results** (ONE-TIME, final evaluation)
+   ```
+   | Dataset | Model | Test PR-AUC | Test Recall | Test F1 | Notes |
+   |---------|-------|-------------|-------------|---------|-------|
+   | creditcard | Best NN | X.XX | X.XX | X.XX | Optimized threshold applied |
+   ```
+
+5. **Generalization Analysis**
+   - Training-validation gap comparison across datasets
+   - Which architectural choices transferred successfully
+   - Dataset-specific findings vs generalizable insights
+
+---
+
+## 🎯 Final Checklist Summary (27 Mandatory Rules)
+
+### Split Creation
+1. ✅ Use stratified splitting to preserve class balance
+2. ✅ Create splits BEFORE any preprocessing
+3. ✅ Save split indices as `.npy` files immediately
+4. ✅ Never re-split data in subsequent notebooks
+5. ✅ Maintain SEPARATE splits for each dataset
+
+### Scaler Fitting
+6. ✅ Fit StandardScaler ONLY on training set
+7. ✅ Transform validation and test sets using fitted scaler (never re-fit)
+8. ✅ Save fitted scaler as `.pkl` immediately after fitting
+9. ✅ All subsequent notebooks load saved scaler (never re-fit)
+10. ✅ Maintain SEPARATE scalers for each dataset
+
+### Hyperparameter Selection
+11. ✅ All hyperparameter decisions based ONLY on validation set
+12. ✅ Architecture selection: based on validation PR-AUC
+13. ✅ Regularization selection: based on validation PR-AUC
+14. ✅ Never use test set for model selection
+
+### Threshold Optimization
+15. ✅ Optimize classification threshold ONLY on validation set
+16. ✅ Test ALL candidate thresholds on validation set
+17. ✅ Select optimal threshold before touching test set
+18. ✅ Apply fixed threshold to test set (no iteration)
+
+### Test Set Protocol
+19. ✅ Test set evaluation happens EXACTLY ONCE per dataset
+20. ✅ Test evaluation is the FINAL step in Notebook 06
+21. ✅ No model re-training after seeing test results
+22. ✅ No threshold adjustment after seeing test results
+23. ✅ Test results are reported as-is, with limitations discussed
+
+### Cross-Dataset Isolation
+24. ✅ NEVER merge datasets
+25. ✅ NEVER train on one dataset and evaluate on another
+26. ✅ NEVER use synthetic data to supplement real data
+27. ✅ Compare results only through final analysis (Notebook 07)
 
 ---
 

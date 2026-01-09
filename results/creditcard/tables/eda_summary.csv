@@ -1,0 +1,8 @@
+metric,value
+total_transactions,284807.0
+fraud_count,492.0
+legitimate_count,284315.0
+fraud_rate_pct,0.1727485630620034
+imbalance_ratio,577.8760162601626
+num_features,30.0
+avg_feature_separability_cohens_d_sample,2.8772032531090934
