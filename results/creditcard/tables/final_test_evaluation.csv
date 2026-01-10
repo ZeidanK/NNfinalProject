@@ -1,0 +1,2 @@
+model_id,threshold,test_size,fraud_count,true_negatives,false_positives,false_negatives,true_positives,precision_fraud,recall_fraud,f1_fraud,precision_legitimate,recall_legitimate,f1_legitimate,accuracy,roc_auc,pr_auc,false_positive_rate,false_negative_rate
+REG-07,0.6,42722,74,42611,37,13,61,0.6224489795918368,0.8243243243243243,0.7093023255813954,0.9996950075075075,0.999132432939411,0.9994136410545079,0.9988296428069847,0.948260936794983,0.7873652600365381,0.0008675670605890077,0.17567567567567569

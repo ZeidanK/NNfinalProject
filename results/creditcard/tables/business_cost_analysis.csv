@@ -1,0 +1,2 @@
+model_id,threshold,cost_fp,cost_fn,benefit_tp,total_fp_cost,total_fn_cost,total_tp_benefit,net_benefit,do_nothing_cost,savings,savings_rate_percent
+REG-07,0.6,25,100,100,925,1300,6100,3875,7400,5175,69.93243243243244
