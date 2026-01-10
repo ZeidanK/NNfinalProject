@@ -1,9 +1,10 @@
-Metric,card_transdata.csv (Synthetic),creditcard.csv (Real-world)
-Total Transactions,"1,000,000","284,807"
+Characteristic,card_transdata,creditcard
+Dataset Type,Synthetic,Real-World (ULB)
+Total Transactions,"~1,000,000","~284,000"
 Number of Features,7,30
-Fraud Rate (%),8.7403,0.1727
-Imbalance Ratio (1:X),10.4,577.9
-Feature Type,Interpretable,PCA-transformed
-Avg Feature Separability (Cohen's d),0.9497,2.8772
-Dataset Role,Architecture Exploration,Production Validation
-Expected Baseline Performance,Random Forest dominant (PR-AUC → 1.0),Competitive baselines (challenging)
+Feature Type,Interpretable (mixed),PCA-transformed
+Fraud Rate (%),~0.80,~0.17
+Imbalance Ratio,1:124,1:577
+Train Set Size,"~700,000","~198,800"
+Val Set Size,"~150,000","~42,600"
+Test Set Size,"~150,000","~42,600"
