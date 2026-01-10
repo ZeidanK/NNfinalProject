@@ -1,0 +1,13 @@
+{
+  "experiment_id": "REG-07",
+  "description": "BatchNorm only",
+  "architecture": [
+    256
+  ],
+  "dropout": 0.0,
+  "l2": 0.0,
+  "batch_norm": true,
+  "val_pr_auc": 0.7802272869686588,
+  "val_f1_fraud": 0.6288659793814433,
+  "vs_rf_baseline": -0.01847045926527846
+}
