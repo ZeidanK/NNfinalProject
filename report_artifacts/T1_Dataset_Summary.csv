@@ -1,0 +1,3 @@
+Dataset,Samples,Features,Target Column,Fraud Count,Fraud Rate (%),Imbalance Ratio
+card_transdata (Synthetic),1000000,7,fraud,87403,8.74,10.4:1
+creditcard (Real-World),284807,30,Class,492,0.1727,578:1

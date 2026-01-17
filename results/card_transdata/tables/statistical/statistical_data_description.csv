@@ -1,0 +1,12 @@
+Property,Value
+Dataset Name,card_transdata.csv
+Source,Synthetic
+Total Observations,"1,000,000"
+Number of Features,7
+Target Variable,fraud
+Legitimate Transactions,"912,597.0"
+Fraudulent Transactions,"87,403.0"
+Fraud Rate (%),8.74
+Imbalance Ratio,10.4:1
+Continuous Features,3
+Binary Features,4

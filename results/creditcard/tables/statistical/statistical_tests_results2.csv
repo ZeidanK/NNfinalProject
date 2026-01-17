@@ -1,0 +1,9 @@
+Feature,Type,Test,Statistic,p-value,Significant (α=0.05),Effect Size,Effect Size Type,Interpretation
+Amount,Continuous,Mann-Whitney U,78049581.0,8.58e-06,Yes,0.1356,Cohen's d,Negligible
+Time,Continuous,Mann-Whitney U,81310602.0,4.39e-10,Yes,0.2968,Cohen's d,Small
+V1,Continuous,Mann-Whitney U,111193870.0,1.74e-113,Yes,2.4531,Cohen's d,Large
+V2,Continuous,Mann-Whitney U,20289296.0,1.65e-163,Yes,2.2075,Cohen's d,Large
+V3,Continuous,Mann-Whitney U,127583455.0,1.21e-219,Yes,4.7356,Cohen's d,Large
+V4,Continuous,Mann-Whitney U,8636598.0,3.63e-248,Yes,3.2425,Cohen's d,Large
+V14,Continuous,Mann-Whitney U,132771289.0,1.47e-260,Yes,7.6436,Cohen's d,Large
+V17,Continuous,Mann-Whitney U,113052725.0,9.22e-124,Yes,8.3176,Cohen's d,Large

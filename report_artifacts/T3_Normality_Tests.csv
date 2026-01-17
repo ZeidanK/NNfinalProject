@@ -1,0 +1,9 @@
+Dataset,Feature,Test,Statistic,p-value,Normal?
+card_transdata,distance_from_home,Shapiro-Wilk,0.3558,1.00e-85,No
+card_transdata,distance_from_last_transaction,Shapiro-Wilk,0.1519,5.44e-92,No
+card_transdata,ratio_to_median_purchase_price,Shapiro-Wilk,0.5336,1.19e-78,No
+creditcard,Amount,Shapiro-Wilk,0.3641,1.95e-85,No
+creditcard,Time,Shapiro-Wilk,0.94,5.15e-41,No
+creditcard,V1,Shapiro-Wilk,0.8121,2.05e-60,No
+creditcard,V14,Shapiro-Wilk,0.9382,1.86e-41,No
+creditcard,V17,Shapiro-Wilk,0.855,1.14e-55,No

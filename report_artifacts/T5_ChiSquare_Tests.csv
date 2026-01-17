@@ -1,0 +1,5 @@
+Feature,Test,χ² Statistic,p-value,Significant?,Cramér's V,Effect Size
+repeat_retailer,Chi-Square,1.83,0.1764,No,0.001,Negligible
+used_chip,Chi-Square,3717.45,0.00e+00,Yes,0.061,Negligible
+used_pin_number,Chi-Square,10057.41,0.00e+00,Yes,0.1,Small
+online_order,Chi-Square,36852.02,0.00e+00,Yes,0.192,Small

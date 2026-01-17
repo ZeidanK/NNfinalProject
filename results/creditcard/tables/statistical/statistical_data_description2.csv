@@ -1,0 +1,12 @@
+Property,Value
+Dataset Name,creditcard.csv
+Source,ULB (Kaggle)
+Total Observations,"284,807"
+Number of Features,30
+Target Variable,Class
+Legitimate Transactions,"284,315"
+Fraudulent Transactions,492
+Fraud Rate (%),0.1727
+Imbalance Ratio,577.9:1
+PCA Features,28
+Original Features,2

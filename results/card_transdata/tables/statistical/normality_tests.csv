@@ -1,0 +1,4 @@
+Feature,Shapiro-Wilk Statistic,p-value,Normal (α=0.05)
+distance_from_home,0.355762,1.00e-85,No
+distance_from_last_transaction,0.151877,5.44e-92,No
+ratio_to_median_purchase_price,0.533597,1.19e-78,No
